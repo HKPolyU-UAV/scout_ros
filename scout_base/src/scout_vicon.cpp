@@ -77,7 +77,7 @@ Vec2 Poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN XY po
     if(output[1] >  MaxTurnrate){ output[1] = MaxTurnrate;}
     if(output[1] < MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}
 
-    cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
+    // cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
     return(output);
 }
 int main(int argc, char **argv)

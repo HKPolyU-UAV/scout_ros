@@ -72,7 +72,7 @@ Vec2 Poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN XY po
         output[i] = u_p[i]+u_i[i]+u_d[i];
     }
     
-    if(output[0] >  0.8){ output[0]= 0.8;}  //Clamp the forward speed to 0.8 m/s
+    if(output[0] >  MaxVelocity){ output[0]= MaxVelocity;}  //Clamp the forward speed to 0.8 m/s
 
     if(output[1] >  MaxTurnrate){ output[1] = MaxTurnrate;}
     if(output[1] < MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}

@@ -14,7 +14,7 @@
     <arg name="simulated_robot" default="false" />
     <arg name="odom_topic_name" default="odom" />
 
-    <node name="scout_base_node" pkg="scout_base" type="scout_base_node">
+    <node name="scout_base_node" pkg="scout_base" type="scout_base_node" output="screen">
         <param name="is_scout_mini" type="bool" value="$(arg is_scout_mini)" />
         <param name="port_name" type="string" value="$(arg port_name)" />
         <param name="simulated_robot" type="bool" value="$(arg simulated_robot)" />
@@ -23,7 +23,7 @@
         <param name="odom_topic_name" type="string" value="$(arg odom_topic_name)" />
     </node>
 
-    <node name="scout_vicon_node" pkg="scout_base" type="scout_vicon" output="screen">
+    <node name="scout_vicon_node" pkg="scout_base" type="scout_vicon" >
     </node>
     
 </launch>

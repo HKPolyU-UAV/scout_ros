@@ -84,7 +84,6 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "scout_vicon");
     ros::NodeHandle nh;
-    // ros::Subscriber sub =nh.subscribe("/cmd_vel_raw",50,callback);
     ros::Subscriber ugvpose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/gh034_car/pose", 5, UGVPose_cb);
     ros::Subscriber ugvdespose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/scout_wp/pose", 5, UGVdesPose_cb);
     ros::Publisher pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",5);
@@ -93,9 +92,9 @@ int main(int argc, char **argv)
 
     while(ros::ok())
     {
-      Vec2 XY = Vec2(5,-5);
-      Vec3 pose_XYyaw = Vec3(0,0,0);
-    //   Vec2 XY = DesUGVpose;
+    //   Vec2 XY = Vec2(5,-5);
+    //   Vec3 pose_XYyaw = Vec3(0,0,0);
+      Vec2 XY = DesUGVpose;
 
       twist_pub(Poistion_controller_PID(pose_XYyaw,XY));
       pub_twist.publish(UGV_twist_pub);

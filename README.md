@@ -49,7 +49,8 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     (the following instructions assume your catkin workspace is at: ~/catkin_ws/src)
 
     ```
-    $ cd ~/catkin_ws/src
+    $ $ mkdir -p ~/scout_ws/src
+    $ cd ~/scout_ws/src
     $ git clone https://github.com/agilexrobotics/ugv_sdk.git  
     $ git clone https://github.com/st88018/scout_ros.git
     $ cd ..

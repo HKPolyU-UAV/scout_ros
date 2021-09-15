@@ -63,18 +63,23 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     ```
     $ sudo modprobe gs_usb
     ```
-    
-* first time use hunter-ros package
+
+* Source the workspace
+   ```
+   $ source ~/scout_ws/devel/setup.bash
+   ```
+
+* first time use gh034-scout-ros package
    ```
    $ rosrun scout_bringup setup_can2usb.bash
    ```
    
-* if not the first time use hunter-ros package(Run this command every time you turn off the power) 
+* if not the first time use gh034-scout-ros package (Run this command every time you turn off the power)
    ```
    $ rosrun scout_bringup bringup_can2usb.bash
    ```
    
-* Testing command
+* Testing canbus command
     ```
     # receiving data from can0
     $ candump can0
@@ -82,26 +87,19 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
 
 4. Launch ROS nodes
 
-* Start the base node for scout
+* Start the base node for scout-mini
 
     ```
     $ roslaunch scout_bringup scout_robot_base.launch 
     ```
 
-    The [scout_bringup/scout_minimal.launch](scout_bringup/launch/scout_minimal.launch) has 5 parameters:
+    The [scout_bringup/scout_mini_robot_base.launch](scout_bringup/launch/scout_mini_robot_base.launch) has 5 parameters:
 
     - port_name: specifies the port used to communicate with the robot, default = "can0"
     - simulated_robot: indicates if launching with a simulation, default = "false"
     - model_xacro: specifies the target ".xacro" file for the publishing of tf frames, default = [scout_v2.xacro](scout_base/description/scout_v2.xacro)
     - odom_topic_name: sets the name of the topic which calculated odometry is published to, defaults = "odom"
     - is_scout_mini:Suitable for chassis of type scout_mini,defaults = "false"
-
-* Start the base node for scout-mini
-
-    ```
-    $ roslaunch scout_bringup scout_mini_robot_base.launch
-    ```
-
 
 * Start the keyboard tele-op node
 

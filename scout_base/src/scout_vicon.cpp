@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Subscriber ugvpose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/gh034_car/pose", 5, UGVPose_cb);
     ros::Subscriber ugvdespose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/scout_wp/pose", 5, UGVdesPose_cb);
-    ros::Publisher pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",5);
+    ros::Publisher  pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",5);
     ros::Rate ros_rate(10);
     cout << "Super Car Initialized" << endl;
 

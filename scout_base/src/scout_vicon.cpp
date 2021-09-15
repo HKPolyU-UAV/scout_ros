@@ -5,11 +5,20 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Twist.h>
+#include <deque>
 #include "utils/common.h"
+#include "utils/ugv_mission.hpp"
 #include "utils/kinetic_math.h"
 #define PI 3.14159265
 
-// geometry_msgs::Twist speed;
+/* FSM */
+int    Mission_state = 0;
+int    Mission_stage = 0;
+int    Current_Mission_stage = 0;
+Vec4   Current_stage_mission;
+double PID_duration;
+double PID_InitTime;
+/* System */
 geometry_msgs::Twist UGV_twist_pub;
 geometry_msgs::PoseStamped UGV_pose_vicon;
 geometry_msgs::PoseStamped UGV_pose_desire;
@@ -17,6 +26,8 @@ Vec3 pose_XYyaw;
 Vec2 DesUGVpose;
 static double MaxTurnrate = 1;      // radius per sec
 static double MaxVelocity = 0.5;    // meters per sec
+bool External_pos_setpoint = false;
+bool FSM_mission = true;
 
 void UGVPose_cb(const geometry_msgs::PoseStamped::ConstPtr& pose){
     UGV_pose_vicon.pose.position.x = pose->pose.position.x;
@@ -36,13 +47,12 @@ void UGVPose_cb(const geometry_msgs::PoseStamped::ConstPtr& pose){
 void UGVdesPose_cb(const geometry_msgs::PoseStamped::ConstPtr& pose){
     UGV_pose_desire.pose.position.x = pose->pose.position.x;
     UGV_pose_desire.pose.position.y = pose->pose.position.y;
-    DesUGVpose = Vec2(UGV_pose_desire.pose.position.x,UGV_pose_desire.pose.position.y);
 }
-void twist_pub(Vec2 VA){
+void ugv_twist_pub(Vec2 VA){
     UGV_twist_pub.linear.x  = VA[0];
     UGV_twist_pub.angular.z = VA[1];
 }
-Vec2 Poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN XY position
+Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN XY position
     // cout << "pose_XY:  " << pose_XYyaw[0] << " " << pose_XYyaw[1] << endl;
     // cout << "setpoint: " << setpoint[0] << " " << setpoint[1] << endl;
     double err_dist = sqrt(pow((setpoint[0]-pose_XYyaw[0]),2)+
@@ -80,6 +90,31 @@ Vec2 Poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN XY po
     // cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
     return(output);
 }
+void ugv_pub(){
+    ugv_twist_pub(ugv_poistion_controller_PID(pose_XYyaw,DesUGVpose));
+    if (PID_InitTime+PID_duration < ros::Time::now().toSec()){
+            Mission_stage++;
+            ugv_twist_pub(Vec2(0,0));
+        }
+}
+void Finite_state_machine(){ 
+    if (Mission_stage != Current_Mission_stage){// Generate trajectory while mission stage change
+        Current_Mission_stage = Mission_stage;//Update Current_Mission_stage
+        Current_stage_mission = waypoints.at(Mission_stage-1);
+        Mission_state = Current_stage_mission[0];
+        if (Mission_state == 1){ //state = 1
+            DesUGVpose = Vec2(Current_stage_mission[1],Current_stage_mission[2]);
+            PID_duration = Current_stage_mission[3];
+            PID_InitTime = ros::Time::now().toSec();
+        }
+        /*For Debug section plot the whole trajectory*/ 
+        // int trajectorysize = trajectory1.size();
+        // for (int i = 0; i < trajectorysize; i++){
+        //   Vec8 current_traj = trajectory1.at(i);
+        //   cout << "dt: " << current_traj[0] << " x: " << current_traj[1] << " y: " << current_traj[2] << " z: " << current_traj[3] << endl;
+        // }
+    }
+}
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "scout_vicon");
@@ -91,15 +126,18 @@ int main(int argc, char **argv)
     cout << "Super Car Initialized" << endl;
 
     while(ros::ok())
-    {
-    //   Vec2 XY = Vec2(5,-5);
-    //   Vec3 pose_XYyaw = Vec3(0,0,0);
-      Vec2 XY = DesUGVpose;
-
-      twist_pub(Poistion_controller_PID(pose_XYyaw,XY));
-      pub_twist.publish(UGV_twist_pub);
-      ros::spinOnce();
-      ros_rate.sleep();
+    {   
+        if(External_pos_setpoint){
+            DesUGVpose = Vec2(UGV_pose_desire.pose.position.x,UGV_pose_desire.pose.position.y);
+            ugv_twist_pub(ugv_poistion_controller_PID(pose_XYyaw,DesUGVpose));
+        }
+        if(FSM_mission){
+            Finite_state_machine();
+            ugv_pub();
+        }
+        pub_twist.publish(UGV_twist_pub);
+        ros::spinOnce();
+        ros_rate.sleep();
     }
 
     return 0;

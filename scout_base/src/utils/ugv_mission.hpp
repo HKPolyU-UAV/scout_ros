@@ -19,7 +19,7 @@ deque<Vec4> Finite_stage_mission(){ //Normal mission
     waypoints.push_back(stage);
     stage << 1, 1.5,-1.5, 3;
     waypoints.push_back(stage);
-    stage << 1, 0, 0, 60;  // state = 5; land.
+    stage << 1, 0, 0, 60;
     waypoints.push_back(stage);
     cout << " Mission generated!" << " Stage count: " << waypoints.size() << endl;
     return(waypoints);

@@ -106,8 +106,14 @@ This repository contains minimal packages to control the scout robot using ROS.
 4. Check the mission file
 
     The [scout_base/src/utils/ugv_mission.hpp](scout_base/src/utils/ugv_mission.hpp) stores the mission waypoints of the FSM module.
+    
+5. Start the mission with scout_mini_vicon.launch
+    
+    ```
+    $ roslaunch scout_base scout_mini_vicon.launch 
+    ```
 
-5. To be continued
-
+    The [scout_base/scout_mini_vicon.launch](scout_base/launch/scout_mini_vicon.launch) has 2 parameters:
+    (Under preparing)
 
 

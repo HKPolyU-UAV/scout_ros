@@ -1,39 +1,13 @@
-# ROS Packages for Using Scout Mini in PolyU VICON
+# ROS Packages for Scout Mini in PolyU VICON
 
 ## Packages
 
-This repository contains minimal packages to control the scout robot using ROS. 
+This repository contains minimal packages to control the scout robot using ROS.
 
 * scout_bringup: launch and configuration files to start ROS nodes 
 * scout_base: a ROS wrapper around [ugv_sdk](https://github.com/agilexrobotics/ugv_sdk) to monitor and control the scout robot
 * scout_description: URDF model for the mobile base, a sample urdf (scout_description/sample/scout_v2_nav.xacro) is provided for customized robot with addtional sensors
 * scout_msgs: scout related message definitions
-
-### Update the packages for your customized robot
-
-**Additional sensors**
-
-It's likely that you may want to add additional sensors to the scout mobile platform, such as a Lidar for navigation. In such cases, a new ".xacro" file needs to be created to describe the relative pose of the new sensor with respect to the robot base, so that the sensor frame can be reflected in the robot tf tree. 
-
-A [sample](scout_description/sample/scout_v2_nav.xacro) ".xacro" file is present in this repository, in which the base ".xacro" file of an empty scout platform is first included, and then additional links are defined. 
-
-The nodes in this ROS package are made to handle only the control of the scout base and publishing of the status. Additional nodes may need to be created by the user to handle the sensors.
-
-**Alternative odometry calculation**
-
-By default the scout_base package will publish odometry message to topic "/odom". In case you want to use a different approach to calculate the odometry, for example estimating the position together with an IMU, you could rename the default odometry topic to be something else.
-
-```
-$ roslaunch scout_bringup scout_base_robot.launch odom_topic_name:="<custom_name>"
-```
-
-## Communication interface setup
-
-Please refer to the [README](https://github.com/westonrobot/ugv_sdk_sdk#hardware-interface) of "ugv_sdk" package for setup of communication interfaces.
-
-#### Note on CAN interface on Nvidia Jetson Platforms
-
-Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main SOC. If you're using a dev kit, you need to add a CAN transceiver for proper CAN communication. 
 
 ## Basic usage of the ROS packages
 
@@ -129,6 +103,11 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
     $ rostopic echo /vrpn_client_node/gh034_car/pose
     ``` 
 
-4. To be continued
+4. Check the mission file
+
+    The [scout_base/src/utils/ugv_mission.hpp](scout_base/src/utils/ugv_mission.hpp) stores the mission waypoints of the FSM module.
+
+5. To be continued
+
 
 

@@ -18,8 +18,8 @@ int    Current_Mission_stage = 0;
 Vec4   Current_stage_mission;
 double PID_duration;
 double PID_InitTime;
-static double MaxTurnrate = 1;      // radius per sec
-static double MaxVelocity = 0.5;    // meters per sec
+double MaxTurnrate = 1;      // radius per sec
+double MaxVelocity = 0.5;    // meters per sec
 /* System */
 geometry_msgs::Twist UGV_twist_pub;
 geometry_msgs::PoseStamped UGV_pose_vicon,UGV_pose_desire;
@@ -86,7 +86,7 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
     if(output[0] >  MaxVelocity){ output[0]= MaxVelocity;}  //Clamp the forward speed to 0.8 m/s
 
     if(output[1] >  MaxTurnrate){ output[1] = MaxTurnrate;}
-    if(output[1] < MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}
+    if(output[1] <  MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}
 
     // cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
     return(output);
@@ -124,7 +124,16 @@ int main(int argc, char **argv)
     ros::Subscriber ugvdespose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/scout_wp/pose", 5, UGVdesPose_cb);
     ros::Publisher  pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",5);
     ros::Rate ros_rate(10);
-    cout << "Scout_Mini Initialized" << endl;
+    nh.getParam("/scout_vicon_node/FSM_mission", FSM_mission);
+    nh.getParam("/scout_vicon_node/External_pos_setpoint", External_pos_setpoint);
+    nh.getParam("/scout_vicon_node/MaxVelocity", MaxVelocity);
+    nh.getParam("/scout_vicon_node/MaxTurnrate", MaxTurnrate);
+    
+    cout << " System maximun velocity : " << MaxVelocity << " m/s  Angular Velocity: " <<  MaxTurnrate << " rad/s" << endl;
+    if (FSM_mission){
+        External_pos_setpoint=false;
+        cout << " FSM activated" << endl;
+    }
 
     while(ros::ok())
     {   

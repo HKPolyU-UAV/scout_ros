@@ -113,7 +113,11 @@ This repository contains minimal packages to control the scout robot using ROS.
     $ roslaunch scout_base scout_mini_vicon.launch 
     ```
 
-    The [scout_base/scout_mini_vicon.launch](scout_base/launch/scout_mini_vicon.launch) has 2 parameters:
-    (Under preparing)
+    The [scout_base/scout_mini_vicon.launch](scout_base/launch/scout_mini_vicon.launch) has 4 parameters:
+    
+    - FSM_mission: determine using Finite state machine or not, default = "true"
+    - External_pos_setpoint: retrieve position commands from "/scout_wp/pose" , default = "false"
+    - MaxVelocity: Maximun forward velocity in meters per second, defult = "0.5"
+    - MaxTurnrate: Maximun turning rate in raduis per second, defult = "1"
 
 

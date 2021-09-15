@@ -111,6 +111,24 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
 
     The default command values of the keyboard teleop node are high, make sure you decrease the speed commands before starting to control the robot with your keyboard! Have your remote controller ready to take over the control whenever necessary. 
 
-5. Use the scout robot in VICON
+## Using the robot in VICON room
 
-* To be continued...
+1. Install VRPN 
+    ```
+    $ sudo apt install -y ros-$ROS_DISTRO--vrpn
+    $ sudo apt install -y ros-$ROS_DISTRO--vrpn-client-ros
+    ```
+
+2. Launch the VRPN sample.launch node
+    ```
+    $ roslaunch vrpn_client_ros sample.launch
+    ```
+
+3. Check the position is correct from the VRPN node
+    ```
+    $ rostopic echo /vrpn_client_node/gh034_car/pose
+    ``` 
+
+4. To be continued
+
+

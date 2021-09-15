@@ -1,4 +1,4 @@
-# ROS Packages for Scout Mobile Robot
+# ROS Packages for Using Scout Mini in PolyU VICON
 
 ## Packages
 
@@ -46,7 +46,7 @@ Nvidia Jeston TX2/Xavier/XavierNX have CAN controller(s) integrated in the main 
 
 2. Clone the packages into your catkin workspace and compile
 
-    (the following instructions assume your catkin workspace is at: ~/catkin_ws/src)
+    (the following instructions assume your catkin workspace is at: ~/scout_ws/src)
 
     ```
     $ mkdir -p ~/scout_ws/src

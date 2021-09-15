@@ -123,7 +123,7 @@ int main(int argc, char **argv)
     ros::Subscriber ugvdespose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/scout_wp/pose", 5, UGVdesPose_cb);
     ros::Publisher  pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",5);
     ros::Rate ros_rate(10);
-    cout << "Super Car Initialized" << endl;
+    cout << "Scout_Mini Initialized" << endl;
 
     while(ros::ok())
     {   

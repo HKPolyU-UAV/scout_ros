@@ -18,16 +18,17 @@ int    Current_Mission_stage = 0;
 Vec4   Current_stage_mission;
 double PID_duration;
 double PID_InitTime;
-/* System */
-geometry_msgs::Twist UGV_twist_pub;
-geometry_msgs::PoseStamped UGV_pose_vicon;
-geometry_msgs::PoseStamped UGV_pose_desire;
-Vec3 pose_XYyaw;
-Vec2 DesUGVpose;
 static double MaxTurnrate = 1;      // radius per sec
 static double MaxVelocity = 0.5;    // meters per sec
+/* System */
+geometry_msgs::Twist UGV_twist_pub;
+geometry_msgs::PoseStamped UGV_pose_vicon,UGV_pose_desire;
+Vec3 pose_XYyaw;
+Vec2 DesUGVpose;
+bool System_init = true;
 bool External_pos_setpoint = false;
 bool FSM_mission = true;
+int coutcounter;
 
 void UGVPose_cb(const geometry_msgs::PoseStamped::ConstPtr& pose){
     UGV_pose_vicon.pose.position.x = pose->pose.position.x;
@@ -127,6 +128,16 @@ int main(int argc, char **argv)
 
     while(ros::ok())
     {   
+        if(System_init){
+            Finite_stage_mission();
+            System_init = false;
+            if (pose_XYyaw[0] == 0 && pose_XYyaw[1] == 0){
+                cout << "------------------------------------------------------------------------------" << endl;
+                cout << "Check VRPN, not recieving position" << endl;
+                cout << "------------------------------------------------------------------------------" << endl;
+                FSM_mission = false;
+            }
+        }
         if(External_pos_setpoint){
             DesUGVpose = Vec2(UGV_pose_desire.pose.position.x,UGV_pose_desire.pose.position.y);
             ugv_twist_pub(ugv_poistion_controller_PID(pose_XYyaw,DesUGVpose));
@@ -136,6 +147,17 @@ int main(int argc, char **argv)
             ugv_pub();
         }
         pub_twist.publish(UGV_twist_pub);
+        /*Mission information cout**********************************************/
+        if(coutcounter > 1 && FSM_mission){ //reduce cout rate
+            cout << "------------------------------------------------------------------------------" << endl;
+            cout << "Mission_Stage: " << Mission_stage << "    Mission_total_stage: " << waypoints.size() << endl;
+            cout << "vicon__pos_x: " << pose_XYyaw[0] << " y: " << pose_XYyaw[1] << " Yaw: "<< pose_XYyaw[2] << endl;
+            cout << "desiredpos_x: " << DesUGVpose[0] << " y: " << DesUGVpose[1]<< endl;
+            cout << "desiredtwist_x: " << UGV_twist_pub.linear.x << " az: " << UGV_twist_pub.angular.z << endl;
+            cout << "ROS_time: " << fixed << ros::Time::now().toSec() << endl;
+            cout << "------------------------------------------------------------------------------" << endl;
+            coutcounter = 0;
+        }else{coutcounter++;}
         ros::spinOnce();
         ros_rate.sleep();
     }

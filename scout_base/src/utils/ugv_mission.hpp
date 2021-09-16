@@ -1,7 +1,7 @@
 #ifndef UGV_MISSION_H
 #define UGV_MISSION_H
 
-#include "common.h"
+#include "common.hpp"
 
 deque<Vec4> waypoints;
 

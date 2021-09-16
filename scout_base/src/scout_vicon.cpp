@@ -6,9 +6,9 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <deque>
-#include "utils/common.h"
+#include "utils/common.hpp"
 #include "utils/ugv_mission.hpp"
-#include "utils/kinetic_math.h"
+#include "utils/kinetic_math.hpp"
 #define PI 3.14159265
 
 /* FSM */

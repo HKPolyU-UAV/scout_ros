@@ -19,7 +19,7 @@ Vec4   Current_stage_mission;
 double PID_duration;
 double PID_InitTime;
 double MaxTurnrate = 1;      // radius per sec
-double MaxVelocity = 0.5;    // meters per sec
+double MaxVelocity = 0.6;    // meters per sec
 /* System */
 geometry_msgs::Twist UGV_twist_pub;
 geometry_msgs::PoseStamped UGV_pose_vicon,UGV_pose_desire;
@@ -54,41 +54,46 @@ void ugv_twist_pub(Vec2 VA){
     UGV_twist_pub.angular.z = VA[1];
 }
 Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN XY position
-    // cout << "pose_XY:  " << pose_XYyaw[0] << " " << pose_XYyaw[1] << endl;
-    // cout << "setpoint: " << setpoint[0] << " " << setpoint[1] << endl;
+    cout << "pose_XYyaw:  " << pose_XYyaw[0] << " " << pose_XYyaw[1] << " " << pose_XYyaw[2] << endl;
+    cout << "setpoint: " << setpoint[0] << " " << setpoint[1] << endl;
     double err_dist = sqrt(pow((setpoint[0]-pose_XYyaw[0]),2)+
                            pow((setpoint[1]-pose_XYyaw[1]),2));
-    // cout << "err_dist: " << err_dist << endl;
+    cout << "err_dist: " << err_dist << endl;
     Vec2 diff_XY = Vec2(setpoint[0]-pose_XYyaw[0],setpoint[1]-pose_XYyaw[1]);
-    double err_yaw = atan2(diff_XY[1],diff_XY[0])-pose_XYyaw[2];
-    // cout << "err_yaw: " << err_yaw << endl;
-    if (err_dist<0.2 && err_yaw > PI*0.3){err_dist = 0;err_yaw = 0;}
-    if (err_dist<0.1){err_dist = 0;err_yaw = 0;}            // Stop if the error is within 10 cm
-    if (err_yaw>PI*0.3||err_yaw<PI*-0.3){ err_dist = 0; }   //Turn before going straight
+    double des_yaw = atan2(diff_XY[1],diff_XY[0]);
+    cout << "car_yaw: " << pose_XYyaw[2] << endl;
+    cout << "des_yaw: " << des_yaw << endl;
+    double err_yaw = des_yaw-pose_XYyaw[2];
+    cout << "err_yaw: " << err_yaw << endl;
+    if (err_yaw>=PI){    err_yaw-=2*PI;}
+    if (err_yaw<=-PI){   err_yaw+=2*PI;}
+    cout << "err_yaw: " << err_yaw << endl;
+    if (err_dist<0.2){err_dist = 0;err_yaw = 0;Mission_stage++;}            // Stop if the error is within 10 cm
+    if (err_yaw>PI*0.15||err_yaw<PI*-0.15){ err_dist = 0; }   //Turn before going straight
 
     Vec2 error,last_error,u_p,u_i,u_d,output; // Dist Yaw Error
     double Last_time = ros::Time::now().toSec();
     double iteration_time = ros::Time::now().toSec() - Last_time;
-    Vec2 K_p(0.2,0.2);
-    Vec2 K_i(0.2,0.2);
-    Vec2 K_d(0,0);
+    Vec2 K_p(0.8,1);
+    Vec2 K_i(0,0);
+    Vec2 K_d(0.2,0);
     error = Vec2(err_dist,err_yaw);
     last_error = error;
     Vec2 integral = integral+(error*iteration_time);
     Vec2 derivative = (error - last_error)/iteration_time;
-    for (int i=0; i<2; i++){                //i = straight_distance,Yaw
+    for (int i=0; i<2; i++){                //i = err_dist,err_yaw
         u_p[i] = error[i]*K_p[i];           //P controller
         u_i[i] = integral[i]*K_i[i];        //I controller
         u_d[i] = derivative[i]*K_d[i];      //D controller
         output[i] = u_p[i]+u_i[i]+u_d[i];
     }
     
-    if(output[0] >  MaxVelocity){ output[0]= MaxVelocity;}  //Clamp the forward speed to 0.8 m/s
+    if(output[0] >  MaxVelocity){ output[0]= MaxVelocity;}  //Clamp the forward speed to MaxVelocity
 
     if(output[1] >  MaxTurnrate){ output[1] = MaxTurnrate;}
     if(output[1] <  MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}
 
-    // cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
+    cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
     return(output);
 }
 void ugv_pub(){
@@ -124,10 +129,10 @@ int main(int argc, char **argv)
     ros::Subscriber ugvdespose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/scout_wp/pose", 5, UGVdesPose_cb);
     ros::Publisher  pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",5);
     ros::Rate ros_rate(10);
-    nh.getParam("/scout_vicon_node/FSM_mission", FSM_mission);
-    nh.getParam("/scout_vicon_node/External_pos_setpoint", External_pos_setpoint);
-    nh.getParam("/scout_vicon_node/MaxVelocity", MaxVelocity);
-    nh.getParam("/scout_vicon_node/MaxTurnrate", MaxTurnrate);
+    // nh.getParam("/scout_vicon_node/FSM_mission", FSM_mission);
+    // nh.getParam("/scout_vicon_node/External_pos_setpoint", External_pos_setpoint);
+    // nh.getParam("/scout_vicon_node/MaxVelocity", MaxVelocity);
+    // nh.getParam("/scout_vicon_node/MaxTurnrate", MaxTurnrate);
     
     cout << " System maximun velocity : " << MaxVelocity << " m/s  Angular Velocity: " <<  MaxTurnrate << " rad/s" << endl;
     if (FSM_mission){
@@ -140,12 +145,12 @@ int main(int argc, char **argv)
         if(System_init){
             Finite_stage_mission();
             System_init = false;
-            if (pose_XYyaw[0] == 0 && pose_XYyaw[1] == 0){
-                cout << "------------------------------------------------------------------------------" << endl;
-                cout << "Check VRPN, not recieving position" << endl;
-                cout << "------------------------------------------------------------------------------" << endl;
-                FSM_mission = false;
-            }
+            // if (pose_XYyaw[0] == 0 && pose_XYyaw[1] == 0){
+            //     cout << "------------------------------------------------------------------------------" << endl;
+            //     cout << "Check VRPN, not recieving position" << endl;
+            //     cout << "------------------------------------------------------------------------------" << endl;
+            //     FSM_mission = false;
+            // }
         }
         if(External_pos_setpoint){
             DesUGVpose = Vec2(UGV_pose_desire.pose.position.x,UGV_pose_desire.pose.position.y);
@@ -157,16 +162,16 @@ int main(int argc, char **argv)
         }
         pub_twist.publish(UGV_twist_pub);
         /*Mission information cout**********************************************/
-        if(coutcounter > 1 && FSM_mission){ //reduce cout rate
-            cout << "------------------------------------------------------------------------------" << endl;
-            cout << "Mission_Stage: " << Mission_stage << "    Mission_total_stage: " << waypoints.size() << endl;
-            cout << "vicon__pos_x: " << pose_XYyaw[0] << " y: " << pose_XYyaw[1] << " Yaw: "<< pose_XYyaw[2] << endl;
-            cout << "desiredpos_x: " << DesUGVpose[0] << " y: " << DesUGVpose[1]<< endl;
-            cout << "desiredtwist_x: " << UGV_twist_pub.linear.x << " az: " << UGV_twist_pub.angular.z << endl;
-            cout << "ROS_time: " << fixed << ros::Time::now().toSec() << endl;
-            cout << "------------------------------------------------------------------------------" << endl;
-            coutcounter = 0;
-        }else{coutcounter++;}
+        // if(coutcounter > 1){ //reduce cout rate
+        //     cout << "------------------------------------------------------------------------------" << endl;
+        //     cout << "Mission_Stage: " << Mission_stage << "    Mission_total_stage: " << waypoints.size() << endl;
+        //     cout << "vicon__pos_x: " << pose_XYyaw[0] << " y: " << pose_XYyaw[1] << " Yaw: "<< pose_XYyaw[2] << endl;
+        //     cout << "desiredpos_x: " << DesUGVpose[0] << " y: " << DesUGVpose[1]<< endl;
+        //     cout << "desiredtwist_x: " << UGV_twist_pub.linear.x << " az: " << UGV_twist_pub.angular.z << endl;
+        //     cout << "ROS_time: " << fixed << ros::Time::now().toSec() << endl;
+        //     cout << "------------------------------------------------------------------------------" << endl;
+        //     coutcounter = 0;
+        // }else{coutcounter++;}
         ros::spinOnce();
         ros_rate.sleep();
     }

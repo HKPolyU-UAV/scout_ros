@@ -89,8 +89,8 @@ This repository contains minimal packages to control the scout robot using ROS.
 
 1. Install VRPN 
     ```
-    $ sudo apt install -y ros-$ROS_DISTRO--vrpn
-    $ sudo apt install -y ros-$ROS_DISTRO--vrpn-client-ros
+    $ sudo apt install -y ros-$ROS_DISTRO-vrpn
+    $ sudo apt install -y ros-$ROS_DISTRO-vrpn-client-ros
     ```
 
 2. Launch the VRPN sample.launch node

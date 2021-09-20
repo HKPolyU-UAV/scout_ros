@@ -118,6 +118,6 @@ This repository contains minimal packages to control the scout robot using ROS.
     - FSM_mission: determine using Finite state machine or not, default = "true"
     - External_pos_setpoint: retrieve position commands from "/scout_wp/pose" , default = "false"
     - MaxVelocity: Maximun forward velocity in meters per second, defult = "0.5"
-    - MaxTurnrate: Maximun turning rate in raduis per second, defult = "1"
+    - MaxTurnrate: Maximun turning rate in radius per second, defult = "1"
 
 

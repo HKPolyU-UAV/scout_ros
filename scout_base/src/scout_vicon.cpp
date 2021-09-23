@@ -19,7 +19,7 @@ Vec4   Current_stage_mission;
 double PID_duration;
 double PID_InitTime;
 double MaxTurnrate = 1;      // radius per sec
-double MaxVelocity = 0.8;    // meters per sec
+double MaxVelocity = 0.3;    // meters per sec
 /* System */
 geometry_msgs::Twist UGV_twist_pub;
 geometry_msgs::PoseStamped UGV_pose_vicon,UGV_pose_desire;
@@ -70,13 +70,12 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
     cout << "err_yaw: " << err_yaw << endl;
     if (err_dist<0.2){err_dist = 0;err_yaw = 0;Mission_stage++;}            // Stop if the error is within 10 cm
     if (err_yaw>PI*0.2||err_yaw<PI*-0.2){ err_dist = 0; }   //Turn before going straight
-
     Vec2 error,last_error,u_p,u_i,u_d,output; // Dist Yaw Error
     double Last_time = ros::Time::now().toSec();
     double iteration_time = ros::Time::now().toSec() - Last_time;
     Vec2 K_p(0.8,1);
-    Vec2 K_i(0.3,0);
-    Vec2 K_d(0.2,0);
+    Vec2 K_i(1  ,0);
+    Vec2 K_d(0  ,0);
     error = Vec2(err_dist,err_yaw);
     last_error = error;
     Vec2 integral = integral+(error*iteration_time);
@@ -85,11 +84,10 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
         u_p[i] = error[i]*K_p[i];           //P controller
         u_i[i] = integral[i]*K_i[i];        //I controller
         u_d[i] = derivative[i]*K_d[i];      //D controller
-        output[i] = u_p[i]+u_i[i]+u_d[i];
+        output[i] = u_p[i]+u_i[i]; //+u_d[i];
     }
     
     if(output[0] >  MaxVelocity){ output[0]= MaxVelocity;}  //Clamp the forward speed to MaxVelocity
-
     if(output[1] >  MaxTurnrate){ output[1] = MaxTurnrate;}
     if(output[1] <  MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}
 
@@ -125,10 +123,10 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "scout_vicon");
     ros::NodeHandle nh;
-    ros::Subscriber ugvpose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/gh034_car/pose", 1, UGVPose_cb);
+    ros::Subscriber ugvpose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/vrpn_client_node/gh034_car/pose", 20, UGVPose_cb);
     ros::Subscriber ugvdespose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/scout_wp/pose", 20, UGVdesPose_cb);
     ros::Publisher  pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",1);
-    ros::Rate ros_rate(10);
+    ros::Rate ros_rate(50);
     // nh.getParam("/scout_vicon_node/FSM_mission", FSM_mission);
     // nh.getParam("/scout_vicon_node/External_pos_setpoint", External_pos_setpoint);
     // nh.getParam("/scout_vicon_node/MaxVelocity", MaxVelocity);

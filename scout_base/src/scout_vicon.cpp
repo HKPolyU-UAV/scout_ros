@@ -69,7 +69,7 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
     if (err_yaw<=-PI){   err_yaw+=2*PI;}
     cout << "err_yaw: " << err_yaw << endl;
     if (err_dist<0.2){err_dist = 0;err_yaw = 0;Mission_stage++;}            // Stop if the error is within 10 cm
-    if (err_yaw>PI*0.2||err_yaw<PI*-0.2){ err_dist = 0; }   //Turn before going straight
+    if (err_yaw>PI*0.3||err_yaw<PI*-0.3){ err_dist = 0; }   //Turn before going straight
     Vec2 error,last_error,u_p,u_i,u_d,output; // Dist Yaw Error
     double Last_time = ros::Time::now().toSec();
     double iteration_time = ros::Time::now().toSec() - Last_time;

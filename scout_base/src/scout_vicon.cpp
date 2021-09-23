@@ -90,7 +90,7 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
     if(output[0] >  MaxVelocity){ output[0]= MaxVelocity;}  //Clamp the forward speed to MaxVelocity
     if(output[1] >  MaxTurnrate){ output[1] = MaxTurnrate;}
     if(output[1] <  MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}
-
+    cout << "iteration_time: " << iteration_time << endl;
     cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
     return(output);
 }

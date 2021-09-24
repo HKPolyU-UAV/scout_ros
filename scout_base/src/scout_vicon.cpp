@@ -29,6 +29,7 @@ bool System_init = true;
 bool External_pos_setpoint = false;
 bool FSM_mission = true;
 int coutcounter;
+double PID_last_time;
 
 void UGVPose_cb(const geometry_msgs::PoseStamped::ConstPtr& pose){
     UGV_pose_vicon.pose.position.x = pose->pose.position.x;
@@ -71,10 +72,9 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
     if (err_dist<0.2){err_dist = 0;err_yaw = 0;Mission_stage++;}            // Stop if the error is within 10 cm
     if (err_yaw>PI*0.3||err_yaw<PI*-0.3){ err_dist = 0; }   //Turn before going straight
     Vec2 error,last_error,u_p,u_i,u_d,output; // Dist Yaw Error
-    double Last_time = ros::Time::now().toSec();
-    double iteration_time = ros::Time::now().toSec() - Last_time;
+    double iteration_time = ros::Time::now().toSec() - PID_last_time;
     Vec2 K_p(0.8,1);
-    Vec2 K_i(1  ,0);
+    Vec2 K_i(0.2  ,0);
     Vec2 K_d(0  ,0);
     error = Vec2(err_dist,err_yaw);
     last_error = error;
@@ -93,6 +93,7 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
     if(output[1] <  MaxTurnrate*-1){ output[1] = MaxTurnrate*-1;}
     cout << "iteration_time: " << iteration_time << endl;
     cout << "output____ v: " << output[0] << " av: " << output[1] << endl;
+    PID_last_time = ros::Time::now().toSec();
     return(output);
 }
 void ugv_pub(){

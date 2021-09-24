@@ -79,12 +79,13 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
     error = Vec2(err_dist,err_yaw);
     last_error = error;
     Vec2 integral = integral+(error*iteration_time);
-    Vec2 derivative = (error - last_error)/iteration_time;
+    Vec2 derivative = (error - last_error)/(iteration_time + 1e-10);
     for (int i=0; i<2; i++){                //i = err_dist,err_yaw
         u_p[i] = error[i]*K_p[i];           //P controller
         u_i[i] = integral[i]*K_i[i];        //I controller
         u_d[i] = derivative[i]*K_d[i];      //D controller
-        output[i] = u_p[i]+u_i[i]; //+u_d[i];
+        cout << "u_p[" << i << "]=" << u_p[i] << " u_i[" << i << "]=" << u_i[i] << " u_d[" << i << "]=" << u_d[i] << endl;
+        output[i] = u_p[i]+u_i[i]+u_d[i];
     }
     
     if(output[0] >  MaxVelocity){ output[0]= MaxVelocity;}  //Clamp the forward speed to MaxVelocity
@@ -111,12 +112,6 @@ void Finite_state_machine(){
             PID_duration = Current_stage_mission[3];
             PID_InitTime = ros::Time::now().toSec();
         }
-        /*For Debug section plot the whole trajectory*/ 
-        // int trajectorysize = trajectory1.size();
-        // for (int i = 0; i < trajectorysize; i++){
-        //   Vec8 current_traj = trajectory1.at(i);
-        //   cout << "dt: " << current_traj[0] << " x: " << current_traj[1] << " y: " << current_traj[2] << " z: " << current_traj[3] << endl;
-        // }
     }
 }
 int main(int argc, char **argv)

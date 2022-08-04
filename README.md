@@ -1,17 +1,17 @@
-# ROS Packages for Scout Mini in PolyU VICON
+# ROS Packages for Scout Mini 
 
 ## Packages
 
 This repository contains minimal packages to control the scout robot using ROS.
 
 * scout_bringup: launch and configuration files to start ROS nodes 
-* scout_base: a ROS wrapper around [ugv_sdk](https://github.com/agilexrobotics/ugv_sdk) to monitor and control the scout robot
-* scout_description: URDF model for the mobile base, a sample urdf (scout_description/sample/scout_v2_nav.xacro) is provided for customized robot with addtional sensors
+* scout_base: a ROS wrapper built around ugv_sdk developed by [AgileX_Robotics](https://github.com/agilexrobotics/ugv_sdk) (which is based on [Weston_Robot](https://github.com/westonrobot/ugv_sdk)) to monitor and control the scout robot
+* scout_description: URDF model for the mobile base, a [sample urdf](scout_description/sample/scout_v2_nav.xacro) is provided for customized robot with addtional sensors
 * scout_msgs: scout related message definitions
 
-## Basic usage of the ROS packages
+## Basic usage of the ROS packages (tested on Melodic and Noetic)
 
-1. Install dependent libraries
+1. Install dependent libraries 
 
     ```
     $ sudo apt install -y libasio-dev
@@ -31,7 +31,7 @@ This repository contains minimal packages to control the scout robot using ROS.
     $ catkin_make
     ```
     
-3. Setup CAN-To-USB adapter
+3. Setup CAN-To-USB adapter (for message exchange between machine and car)
 
 * Enable gs_usb kernel module(If you have already added this module, you do not need to add it)
     ```
@@ -100,7 +100,7 @@ This repository contains minimal packages to control the scout robot using ROS.
 
 3. Check the position is correct from the VRPN node
     ```
-    $ rostopic echo /vrpn_client_node/gh034_car/pose
+    $ rostopic echo /vrpn_client_node/gh034_car/pose or ${your_topic}
     ``` 
 
 4. Check the mission file
@@ -121,3 +121,34 @@ This repository contains minimal packages to control the scout robot using ROS.
     - MaxTurnrate: Maximun turning rate in radius per second, defult = "1"
 
 
+
+## Using the robot with [VIO](https://github.com/HKPolyU-UAV/FLVIS)
+to be continued...
+<!-- 
+1. Follow [FLVIS](https://github.com/HKPolyU-UAV/FLVIS) installation instruction, which has been tested on ubuntu 18.04 & 20.04
+
+
+
+2. Check position 
+    ```
+    $ rostopic echo /vrpn_client_node/gh034_car/pose
+    ``` 
+
+3. Check the mission file
+
+    The [scout_base/src/utils/ugv_mission.hpp](scout_base/src/utils/ugv_mission.hpp) stores the mission waypoints of the FSM module.
+
+4. Start the mission with scout_mini_vicon.launch
+    
+    ```
+    $ roslaunch scout_base scout_mini_vicon.launch 
+    ```
+
+    The [scout_base/scout_mini_vicon.launch](scout_base/launch/scout_mini_vicon.launch) has 4 parameters:
+    
+    - FSM_mission: determine using Finite state machine or not, default = "true"
+    - External_pos_setpoint: retrieve position commands from "/scout_wp/pose" , default = "false"
+    - MaxVelocity: Maximun forward velocity in meters per second, defult = "0.5"
+    - MaxTurnrate: Maximun turning rate in radius per second, defult = "1"
+
+ -->

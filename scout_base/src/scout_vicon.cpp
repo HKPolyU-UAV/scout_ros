@@ -98,7 +98,7 @@ Vec2 ugv_poistion_controller_PID(Vec3 pose_XYyaw, Vec2 setpoint){ // From VRPN X
 }
 void ugv_pub(){
     ugv_twist_pub(ugv_poistion_controller_PID(pose_XYyaw,DesUGVpose));
-    if (PID_InitTime+PID_duration < ros::Time::now().toSec()){
+    if (PID_InitTime + PID_duration < ros::Time::now().toSec()){
             Mission_stage++;
             ugv_twist_pub(Vec2(0,0));
         }
@@ -107,7 +107,9 @@ void Finite_state_machine(){
     if (Mission_stage != Current_Mission_stage){// Generate trajectory while mission stage change
         Current_Mission_stage = Mission_stage;//Update Current_Mission_stage
         Current_stage_mission = waypoints.at(Mission_stage-1);
+        
         Mission_state = Current_stage_mission[0];
+        
         if (Mission_state == 1){ //state = 1
             DesUGVpose = Vec2(Current_stage_mission[1],Current_stage_mission[2]);
             PID_duration = Current_stage_mission[3];
@@ -127,6 +129,8 @@ int main(int argc, char **argv)
     nh.getParam("/scout_vicon_node/External_pos_setpoint", External_pos_setpoint);
     nh.getParam("/scout_vicon_node/MaxVelocity", MaxVelocity);
     nh.getParam("/scout_vicon_node/MaxTurnrate", MaxTurnrate);
+
+    
     
     cout << " System maximun velocity : " << MaxVelocity << " m/s  Angular Velocity: " <<  MaxTurnrate << " rad/s" << endl;
     if (FSM_mission){

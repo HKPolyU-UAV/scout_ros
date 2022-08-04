@@ -9,7 +9,7 @@ deque<Vec4> Finite_stage_mission(){ //Normal mission
     waypoints.clear();
     // Waypoints
     Vec4 stage; // state x y duration
-    stage << 1, -1.2, -1.4, 120;
+    stage << 1, -1.2, -1.4, 120; //stage, x, y, second
     waypoints.push_back(stage);
     stage << 1, -1.2, -1.4, 120;
     waypoints.push_back(stage);

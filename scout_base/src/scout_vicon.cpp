@@ -123,10 +123,10 @@ int main(int argc, char **argv)
     ros::Subscriber ugvdespose_sub = nh.subscribe<geometry_msgs::PoseStamped>("/scout_wp/pose", 20, UGVdesPose_cb);
     ros::Publisher  pub_twist =nh.advertise<geometry_msgs::Twist>("/cmd_vel",1);
     ros::Rate ros_rate(50);
-    // nh.getParam("/scout_vicon_node/FSM_mission", FSM_mission);
-    // nh.getParam("/scout_vicon_node/External_pos_setpoint", External_pos_setpoint);
-    // nh.getParam("/scout_vicon_node/MaxVelocity", MaxVelocity);
-    // nh.getParam("/scout_vicon_node/MaxTurnrate", MaxTurnrate);
+    nh.getParam("/scout_vicon_node/FSM_mission", FSM_mission);
+    nh.getParam("/scout_vicon_node/External_pos_setpoint", External_pos_setpoint);
+    nh.getParam("/scout_vicon_node/MaxVelocity", MaxVelocity);
+    nh.getParam("/scout_vicon_node/MaxTurnrate", MaxTurnrate);
     
     cout << " System maximun velocity : " << MaxVelocity << " m/s  Angular Velocity: " <<  MaxTurnrate << " rad/s" << endl;
     if (FSM_mission){

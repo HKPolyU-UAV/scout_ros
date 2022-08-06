@@ -25,8 +25,7 @@ This repository contains minimal packages to control the scout robot using ROS.
     ```
     $ mkdir -p ~/scout_ws/src
     $ cd ~/scout_ws/src
-    $ git clone https://github.com/agilexrobotics/ugv_sdk.git  
-    $ git clone https://github.com/st88018/scout_ros.git
+    $ git clone https://github.com/HKPolyU-UAV/scout_ros.git
     $ cd ..
     $ catkin_make
     ```
